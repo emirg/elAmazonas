@@ -130,7 +130,7 @@ init(cell(3,15,a)).
 
 init(cell(3,16,a)).
 
-init(cell(3,17,p)).
+init(cell(3,17,a)).
 
 init(cell(3,18,a)).
 
@@ -208,13 +208,13 @@ init(cell(5,12,a)).
 
 init(cell(5,13,a)).
 
-init(cell(5,14,a)).
+init(cell(5,14,i)).
 
-init(cell(5,15,a)).
+init(cell(5,15,i)).
 
-init(cell(5,16,a)).
+init(cell(5,16,i)).
 
-init(cell(5,17,a)).
+init(cell(5,17,i)).
 
 init(cell(5,18,a)).
 
@@ -250,13 +250,13 @@ init(cell(6,12,a)).
 
 init(cell(6,13,a)).
 
-init(cell(6,14,a)).
+init(cell(6,14,i)).
 
-init(cell(6,15,a)).
+init(cell(6,15,i)).
 
-init(cell(6,16,a)).
+init(cell(6,16,i)).
 
-init(cell(6,17,a)).
+init(cell(6,17,i)).
 
 init(cell(6,18,a)).
 
@@ -274,11 +274,11 @@ init(cell(7,3,a)).
 
 init(cell(7,4,i)).
 
-init(cell(7,5,a)).
+init(cell(7,5,i)).
 
-init(cell(7,6,a)).
+init(cell(7,6,i)).
 
-init(cell(7,7,a)).
+init(cell(7,7,i)).
 
 init(cell(7,8,a)).
 
@@ -292,13 +292,13 @@ init(cell(7,12,a)).
 
 init(cell(7,13,a)).
 
-init(cell(7,14,a)).
+init(cell(7,14,i)).
 
-init(cell(7,15,a)).
+init(cell(7,15,i)).
 
-init(cell(7,16,a)).
+init(cell(7,16,i)).
 
-init(cell(7,17,a)).
+init(cell(7,17,i)).
 
 init(cell(7,18,a)).
 
@@ -314,13 +314,13 @@ init(cell(8,2,a)).
 
 init(cell(8,3,a)).
 
-init(cell(8,4,a)).
+init(cell(8,4,i)).
 
-init(cell(8,5,a)).
+init(cell(8,5,i)).
 
-init(cell(8,6,a)).
+init(cell(8,6,i)).
 
-init(cell(8,7,a)).
+init(cell(8,7,i)).
 
 init(cell(8,8,a)).
 
@@ -356,13 +356,13 @@ init(cell(9,2,a)).
 
 init(cell(9,3,a)).
 
-init(cell(9,4,a)).
+init(cell(9,4,i)).
 
-init(cell(9,5,a)).
+init(cell(9,5,i)).
 
-init(cell(9,6,a)).
+init(cell(9,6,i)).
 
-init(cell(9,7,a)).
+init(cell(9,7,i)).
 
 init(cell(9,8,a)).
 
@@ -526,7 +526,7 @@ init(cell(13,3,a)).
 
 init(cell(13,4,a)).
 
-init(cell(13,5,p)).
+init(cell(13,5,a)).
 
 init(cell(13,6,a)).
 
@@ -704,13 +704,13 @@ init(cell(17,8,a)).
 
 init(cell(17,9,a)).
 
-init(cell(17,10,a)).
+init(cell(17,10,i)).
 
-init(cell(17,11,a)).
+init(cell(17,11,i)).
 
-init(cell(17,12,a)).
+init(cell(17,12,i)).
 
-init(cell(17,13,a)).
+init(cell(17,13,i)).
 
 init(cell(17,14,a)).
 
@@ -746,13 +746,13 @@ init(cell(18,8,a)).
 
 init(cell(18,9,a)).
 
-init(cell(18,10,a)).
+init(cell(18,10,i)).
 
-init(cell(18,11,a)).
+init(cell(18,11,i)).
 
-init(cell(18,12,a)).
+init(cell(18,12,i)).
 
-init(cell(18,13,a)).
+init(cell(18,13,i)).
 
 init(cell(18,14,a)).
 
@@ -760,7 +760,7 @@ init(cell(18,15,a)).
 
 init(cell(18,16,a)).
 
-init(cell(18,17,p)).
+init(cell(18,17,a)).
 
 init(cell(18,18,a)).
 
@@ -788,13 +788,13 @@ init(cell(19,8,a)).
 
 init(cell(19,9,a)).
 
-init(cell(19,10,a)).
+init(cell(19,10,i)).
 
-init(cell(19,11,a)).
+init(cell(19,11,i)).
 
-init(cell(19,12,a)).
+init(cell(19,12,i)).
 
-init(cell(19,13,a)).
+init(cell(19,13,i)).
 
 init(cell(19,14,a)).
 
