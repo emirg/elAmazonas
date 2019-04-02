@@ -130,7 +130,7 @@ init(cell(3,15,a)).
 
 init(cell(3,16,a)).
 
-init(cell(3,17,a)).
+init(cell(3,17,p)).
 
 init(cell(3,18,a)).
 
@@ -526,7 +526,7 @@ init(cell(13,3,a)).
 
 init(cell(13,4,a)).
 
-init(cell(13,5,a)).
+init(cell(13,5,p)).
 
 init(cell(13,6,a)).
 
@@ -760,7 +760,7 @@ init(cell(18,15,a)).
 
 init(cell(18,16,a)).
 
-init(cell(18,17,a)).
+init(cell(18,17,p)).
 
 init(cell(18,18,a)).
 
