@@ -1,6 +1,6 @@
 %para ejecutar ?-inicio,juego. (Run!)
 
- %hola
+ 
 
 %roles o y x
 
@@ -272,7 +272,7 @@ init(cell(7,2,a)).
 
 init(cell(7,3,a)).
 
-init(cell(7,4,a)).
+init(cell(7,4,i)).
 
 init(cell(7,5,a)).
 
