@@ -1,6 +1,6 @@
 %para ejecutar ?-inicio,juego. (Run!)
 
- 
+ %hola
 
 %roles o y x
 
