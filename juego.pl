@@ -1199,6 +1199,33 @@ retract(estado(N)),
 N2 is N +1,
 
 assert(estado(N2)).
+%imprime estado actual del juego
+imprime:-
+	estado(E),
+	display('Estado: '),display(E),nl,
+	t(control(X)),
+	display('Control: '),display(X),nl,
+	imprime_fila(1),
+	imprime_fila(2),
+	imprime_fila(3),
+    imprime_fila(4),
+	imprime_fila(5),
+	imprime_fila(6),
+    imprime_fila(7),
+	imprime_fila(8),
+	imprime_fila(9),
+    imprime_fila(10),
+	imprime_fila(11),
+	imprime_fila(12),
+    imprime_fila(13),
+	imprime_fila(14),
+	imprime_fila(15),
+    imprime_fila(16),
+	imprime_fila(17),
+	imprime_fila(18),
+    imprime_fila(19),
+	imprime_fila(20),
+	display('********').
 
 imprime_fila(N):-
 
