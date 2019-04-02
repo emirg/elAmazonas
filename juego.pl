@@ -148,7 +148,7 @@ init(cell(4,3,a)).
 
 init(cell(4,4,a)).
 
-init(cell(4,5,a)).
+init(cell(4,5,b)).
 
 init(cell(4,6,a)).
 
@@ -368,7 +368,7 @@ init(cell(9,8,a)).
 
 init(cell(9,9,a)).
 
-init(cell(9,10,a)).
+init(cell(9,10,b)).
 
 init(cell(9,11,a)).
 
@@ -590,7 +590,7 @@ init(cell(14,14,a)).
 
 init(cell(14,15,a)).
 
-init(cell(14,16,a)).
+init(cell(14,16,b)).
 
 init(cell(14,17,a)).
 
@@ -734,7 +734,7 @@ init(cell(18,2,a)).
 
 init(cell(18,3,a)).
 
-init(cell(18,4,a)).
+init(cell(18,4,b)).
 
 init(cell(18,5,a)).
 
