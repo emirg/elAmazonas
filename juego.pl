@@ -1,5 +1,23 @@
 %Para ejecutar ?-inicio,juego. (Run!)
 
+% Predicados de GDL
+% role(a) a es un rol
+% base(p) p es una proposición base
+% input(r,a) a es una acción posible para el rol r
+% init(p) p es verdadero en el estado inicial.
+% true(p) p es verdadero en el estado actual.
+% does(r,a) el rol r realiza la acción a en el estado actual.
+% next(p) p es verdadero en el próximo estado.
+% legal(r,a) es legal para el rol r realizar la acción a en el estado actual.
+% goal(r,n) el jugador r ha conseguido n (puntos utilidades) en el estado actual.
+% terminal el estado actual es terminal.
+
+:- dynamic serpiente/2, orientacion/2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Utilidades de Listas %
+%%%%%%%%%%%%%%%%%%%%%%%%
+
 % head/2 - head(List, Head)
 % Primer elemento de una lista
 head([Head|_],Head).
@@ -15,7 +33,24 @@ last([Head|[]],Head).
 last([_|Tail],Head) :-
     last(Tail,Head).
 
+addBegin(X,L,R):- append([X],L,R).
+
 addEnd(X,L,R):- append(L,[X],R).
+
+removeLast([X|Xs], Ys) :- removeLastAux(Xs, Ys, X).           
+
+removeLastAux([], [], _).
+removeLastAux([X1|Xs], [X0|Ys], X0) :- removeLastAux(Xs, Ys, X1). 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Predicados para definir acciones de las serpientes %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Direcciones
+direccion(left).
+direccion(right).
+direccion(up).
+direccion(down).
 
 % Posiciones validas dada una direccion
 allowed(left,down) :- !.
@@ -33,17 +68,35 @@ oposite(right,left).
 oposite(up,down).
 oposite(down,up).
 
+% Modificador de posición
+decrease(left,0,-1).
+decrease(right,0,1).
+decrease(up,-1,0).
+decrease(down,1,0).
 
-%Roles
-role(c). %Charlie / Jugador 1
-role(x). %Simon / Jugador 2
+%%%%%%%%%
+% Roles %
+%%%%%%%%%
+role(j1). %Charlie / Jugador 1
+role(j2). %Simon / Jugador 2
 
-%Limites del tablero
+%%%%%%%%%%%%%%%%%%%%%%%
+% Limites del tablero %
+%%%%%%%%%%%%%%%%%%%%%%%
 limites_tablero(20,20). %(cantidad_filas,cantidad_columnas)
 cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 
 
-%Estado inicial
+%%%%%%%%%%%%%%%%%%
+% Estado inicial %
+%%%%%%%%%%%%%%%%%%
+% Celdas:
+%   a -> Agua
+%   b -> Barril
+%   i -> Isla
+%   sj1 -> Serpiente 1
+%   sj2 -> Serpiente 2
+
 init(cell(1,1,a)).
 init(cell(1,2,a)).
 init(cell(1,3,a)).
@@ -80,9 +133,9 @@ init(cell(2,13,a)).
 init(cell(2,14,a)).
 init(cell(2,15,a)).
 init(cell(2,16,a)).
-init(cell(2,17,a)).
-init(cell(2,18,a)).
-init(cell(2,19,a)).
+init(cell(2,17,j1)).
+init(cell(2,18,j1)).
+init(cell(2,19,j1)).
 init(cell(2,20,a)).
 init(cell(3,1,a)).
 init(cell(3,2,a)).
@@ -380,9 +433,9 @@ init(cell(17,13,i)).
 init(cell(17,14,a)).
 init(cell(17,15,a)).
 init(cell(17,16,a)).
-init(cell(17,17,a)).
-init(cell(17,18,a)).
-init(cell(17,19,a)).
+init(cell(17,17,j2)).
+init(cell(17,18,j2)).
+init(cell(17,19,j2)).
 init(cell(17,20,a)).
 init(cell(18,1,a)).
 init(cell(18,2,a)).
@@ -444,7 +497,9 @@ init(cell(20,17,a)).
 init(cell(20,18,a)).
 init(cell(20,19,a)).
 init(cell(20,20,a)).
-init(control(c)). %Empieza jugando Charlie
+init(serpiente(j1,left,[(2,17),(2,18),(2,19)])). % Charlie
+init(serpiente(j2,left,[(17,17),(17,18),(17,19)])). % Simon
+init(control(j1)). %Empieza jugando Charlie
 
  
 
@@ -454,6 +509,7 @@ base(cell(X,Y,a)):- index(X),index(Y).
 base(cell(X,Y,i)):- index(X),index(Y).
 base(cell(X,Y,b)):- index(X),index(Y).
 base(cell(X,Y,R)):- role(R),index(X),index(Y).
+base(serpiente(R,D,L)):- role(R), direccion(D),is_list(L).
 
 index( 1 ).
 index( 2 ).
@@ -476,31 +532,27 @@ index( 18 ).
 index( 19 ).
 index( 20 ).
 
- 
+%%%%%%%%%%
+% Inputs %
+%%%%%%%%%%
 %Posibles valores que pueden tener las entradas
-input(R,move(X,Y)):- role(R),index(X),index(Y).
+input(R,move(X)):- role(R),direccion(X).
 input(R,noop):-role(R).
 
  
-
-%Movimientos legales
-legal(J1,move(X,Y)) :-
-  t(cell(Xa,Ya,)),
-  can_move(J1,(Xa,Ya),(X,Y)),
-  t(control(x)).
-
+%%%%%%%%%%%%%%%%%%%%%%%
+% Movimientos legales %
+%%%%%%%%%%%%%%%%%%%%%%%
+legal(J1,move(X)) :-
+  serpiente(J1,D,L), 
+  allowed(D,X), 
+  t(control(J1)).
 
 legal(J2,noop) :-
   role(J1),
   distinct(J1,J2).
 
-
-% Orientacion de la serpiente. Hay que poner el rol? Creo que si
-orientacion(R,X,Y):- role(R), X is 1, Y is 0.
-orientacion(R,X,Y):- role(R),X is -1, Y is 0.
-orientacion(R,X,Y):- role(R),X is 0, Y is 1.
-orientacion(R,X,Y):- role(R),X is 0, Y is -1.
-
+% Posiblemente no la necesitemos
 can_move(R,(X1,Y1),(X2,Y2)):- 
   orientacion(R,A,B), 
   X2 is X1 + A, 
@@ -515,18 +567,11 @@ snakeMember([[X|[Y|_]]|_],X,Y) :- !.
 snakeMember([_|Tail],X,Y) :- 
     snakeMember(Tail,X,Y).
 
-%Por ahora no le encuentro al proposito a moves, con can_move creo que basta
-moves((X1,Y1),(X2,Y2)):- X2 is X1-1, Y2 is Y1-2, can_move(X2,Y2).
-moves((X1,Y1),(X2,Y2)):- X2 is X1-1, Y2 is Y1+2, can_move(X2,Y2).
-moves((X1,Y1),(X2,Y2)):- X2 is X1+1, Y2 is Y1-2, can_move(X2,Y2).
-moves((X1,Y1),(X2,Y2)):- X2 is X1+1, Y2 is Y1+2, can_move(X2,Y2).
-moves((X1,Y1),(X2,Y2)):- X2 is X1-2, Y2 is Y1-1, can_move(X2,Y2).
-moves((X1,Y1),(X2,Y2)):- X2 is X1-2, Y2 is Y1+1, can_move(X2,Y2).
-moves((X1,Y1),(X2,Y2)):- X2 is X1+2, Y2 is Y1-1, can_move(X2,Y2).
-moves((X1,Y1),(X2,Y2)):- X2 is X1+2, Y2 is Y1+1, can_move(X2,Y2).
 
 
- 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% OBTENCION DEL PROXIMO ESTADO %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %próximo estado
 next(cell(M,N,x)) :-
@@ -619,51 +664,7 @@ goal(o,100) :- line(x), \+line(o).
 
  
 
- 
 
-line(Z) :- row(_M,Z).
-
-line(Z) :- column(_M,Z).
-
-line(Z) :- diagonal(Z).
-
- 
-
-row(M,Z) :-
-  t(cell(M,1,Z)) ,
-
-  t(cell(M,2,Z)) ,
-
-  t(cell(M,3,Z)).
-
- 
-column(_M,Z) :-
-
-  t(cell(1,N,Z)) ,
-
-  t(cell(2,N,Z)) ,
-
-  t(cell(3,N,Z)).
-
- 
-
-diagonal(Z) :-
-  t(cell(1,1,Z)) ,
-
-  t(cell(2,2,Z)) ,
-
-  t(cell(3,3,Z)).
-
- 
-
-diagonal(Z) :-
-  t(cell(1,3,Z)) ,
-
-  t(cell(2,2,Z)) ,
-
-  t(cell(3,1,Z)).
-
- 
 
 terminal :- line(x).
 
@@ -865,7 +866,7 @@ imprime_fila(N):-
 
     t(cell(N,19,C19)),t(cell(N,20,C20)),
 
-                display(C1),display(C2),display(C3),
+    display(C1),display(C2),display(C3),
 
     display(C4),display(C5),display(C6),
 
