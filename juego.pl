@@ -12,7 +12,7 @@
 % goal(r,n) el jugador r ha conseguido n (puntos utilidades) en el estado actual.
 % terminal el estado actual es terminal.
 
-:- dynamic serpiente/4, orientacion/2, t/1 , does/2.
+:-dynamic t/1,h/2,hs/2,estado/1,does/2,serpiente/4,control/1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Utilidades de Listas %
@@ -33,8 +33,8 @@ last([Head|[]],Head).
 last([_|Tail],Head) :-
     last(Tail,Head).
 
-in(X,[]):- !, fail.
-in(X,[X|L]):- !.
+in(_,[]):- !, fail.
+in(X,[X|_]):- !.
 in(X,[_|L]):- in(X,L).
 
 addBegin(X,L,R):- append([X],L,R).
@@ -107,8 +107,8 @@ cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 %   b -> Barril
 %   i -> Isla
 %   p -> Persona
-%   j1 -> Serpiente 1
-%   j2 -> Serpiente 2
+%   s -> Serpiente 1
+%   c-> Serpiente 2
 
 init(cell(1,1,a)).
 init(cell(1,2,a)).
@@ -146,9 +146,9 @@ init(cell(2,13,a)).
 init(cell(2,14,a)).
 init(cell(2,15,a)).
 init(cell(2,16,a)).
-init(cell(2,17,j1)).
-init(cell(2,18,j1)).
-init(cell(2,19,j1)).
+init(cell(2,17,c)).
+init(cell(2,18,c)).
+init(cell(2,19,c)).
 init(cell(2,20,a)).
 init(cell(3,1,a)).
 init(cell(3,2,a)).
@@ -446,9 +446,9 @@ init(cell(17,13,i)).
 init(cell(17,14,a)).
 init(cell(17,15,a)).
 init(cell(17,16,a)).
-init(cell(17,17,j2)).
-init(cell(17,18,j2)).
-init(cell(17,19,j2)).
+init(cell(17,17,s)).
+init(cell(17,18,s)).
+init(cell(17,19,s)).
 init(cell(17,20,a)).
 init(cell(18,1,a)).
 init(cell(18,2,a)).
@@ -558,7 +558,7 @@ input(R,noop):-role(R).
 % Movimientos legales %
 %%%%%%%%%%%%%%%%%%%%%%%
 legal(J1,move(X)) :-
-  serpiente(J1,D,L,V),
+  serpiente(J1,D,_,V),
   V > 0, 
   allowed(D,X), 
   t(control(J1)).
@@ -597,8 +597,15 @@ next(cell(M,N,i)) :-
 next(cell(M,N,b)) :-
       t(cell(M,N,b)).
   
-next(cell(M,N,a)) :-
+next(cell(M,N,c)) :-
+      t(cell(M,N,c)).
+
+next(cell(M,N,s)) :-
+      t(cell(M,N,s)).
+
+next(cell(M,N,p)) :-
       t(cell(M,N,p)).
+
 
 %%%%%%%%  %%%%%%%%%%%
 % Mapa %  % REVISAR %
@@ -637,7 +644,7 @@ next(cell(M,N,j1)) :-
 % Si la serpiente se movio el cuerpo queda igual (excepto cabeza y fin de cola)
 next(cell(M,N,j1)) :-
   t(cell(M,N,j1)),
-  does(j1,move(O)),
+  does(j1,move(_)),
   serpiente(j1,_,S,V),
   V > 0,
   \+last(S,(M,N)).
@@ -645,7 +652,7 @@ next(cell(M,N,j1)) :-
 % Si la serpiente se movio, la cola ya no esta mas ocupando un espacio
 next(cell(M,N,a)) :-
   t(cell(M,N,j1)),
-  does(j1,move(O)),
+  does(j1,move(_)),
   serpiente(j1,_,S,V),
   V > 0,
   last(S,(M,N)).
@@ -712,13 +719,13 @@ next(serpiente(j1,D,S,0)):-
 next(serpiente(j1,D,S,V)):-
   t(control(j1)),
   does(j1,move(D)),
-  serpiente(j1,_,[(X,Y)|Sv],V),
+  serpiente(j1,_,[(X,Y)|_],V),
   V > 0,
   decrease(D,A,B),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
   t(cell(XCabezaNueva,YCabezaNueva,j2)), % Deberia llevar el predicado t()?
-  addBegin((XCabezaNueva,YCabezaNueva),L1,S).
+  addBegin((XCabezaNueva,YCabezaNueva),_,S).
 
 
 
@@ -736,7 +743,8 @@ next(control(j2)) :-
 
 % Hay que ver todavia como suma puntos el jugador (supong que comiendo gente)
 % y como mantener ese dato (eso es lo de menos, deberia ser facil)
-% goal(J,):_
+
+goal(_,0).
 
 terminal :- serpiente(_,_,_,0). % Si una serpiente muere entonces termina el juego.
 
@@ -754,163 +762,118 @@ distinct(X,Y):- X\==Y.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%inicializa estado inicial y borra historial
-
-:-dynamic t/1,h/2,estado/1,does/2.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GESTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 inicio:-
-
-                retractall(t(_)),
-
-                retractall(h(_,_)),
-
-                retractall(estado(_)),
-
-                crea_estado_inicial.
-
- 
+    retractall(t(_)),
+    retractall(h(_,_)),
+    retractall(estado(_)),
+    crea_estado_inicial.
 
 %crea estado inicial
-
 crea_estado_inicial:-
-
-                init(X),
-
+    init(X),
     \+(t(X)),
-
-                assert(t(X)),
-
+    assert(t(X)),
     assert(h(0,X)),
-
-                crea_estado_inicial.
+    crea_estado_inicial.
 
 crea_estado_inicial:-
+    assert(estado(1)).
 
-                assert(estado(1)).
-
- 
-
- 
 
 % gestor del juego
-
 % borra acciones viejas
-
 % busca nuevas acciones
-
-%mark calcula próximo estado
-
+% calcula próximo estado
 % crea proximo estado
 
- 
+juego:-
+    \+terminal,
+    retractall(does(_X,_A)),
+    inserta_acciones,
+    proximo_estado,
+    retractall(t(_Y)),
+    crea_estado,nl,
+    %  imprimeT([]),
+    imprime,
+    juego.
 
-juego:- \+terminal,
 
-retractall(does(_X,_A)),
-
-inserta_acciones,
-
-proximo_estado,
-
-retractall(t(_Y)),
-
-crea_estado,
-
-imprime,
-
-juego.
-
- 
-
-juego:- terminal,
-
-                goal(x,Px),goal(o,Po),
-
-                display('x gano '),display(Px),display(' puntos y o gano '),display(Po),display(' puntos.').
-
- 
+juego:-
+    terminal,
+    nl,
+    display('El juego termino'),
+    nl,
+    goal(h,Px),
+    goal(e,Po),
+    display('Heinrich obtuvo '),
+    display(Px),
+    display(' puntos y el enemigo obtuvo '),
+    display(Po),
+    display(' puntos.').
 
 % busca las nuevas acciones de los jugadores y las inserta
+inserta_acciones:-
+    t(control(X)),
+    jugador(X,A),
+    legal(X,A),
+    assert(does(X,A)),
+    role(O),
+    distinct(X,O),
+    assert(does(O,noop)).
 
-inserta_acciones:- t(control(X)),
-
-   jugador(X,A), legal(X,A),
-
-   assert(does(X,A)),
-
-   role(O), distinct(X,O),
-
-   assert(does(O,noop)).
-
- 
-
-%calcula el próximo estado
-
+% buscamos las acciones posibles, elegimos la mejor (en caso de no existir no deberia hacerse nada) y
+% la ejecutamos.
 proximo_estado:-
-
-        estado(E),
-
-                next(Y),
-
-                \+(h(E,Y)),
-
-                assert(h(E,Y)),
-
-                proximo_estado.
+    estado(E),
+    next(Y),
+    \+(h(E,Y)),
+    assert(h(E,Y)),
+    proximo_estado.
 
 proximo_estado.
 
- 
-
 %crea el estado actual
+crea_estado:-
+    estado(E),
+    h(E,Y),
+    \+(t(Y)),
+    assert(t(Y)),
+    crea_estado.
 
 crea_estado:-
-
-                estado(E),
-
-                h(E,Y),
-
-                \+(t(Y)),
-
-                assert(t(Y)),
-
-                crea_estado.
-
-crea_estado:-
-
-retract(estado(N)),
-
-N2 is N +1,
-
-assert(estado(N2)).
+    retract(estado(N)),
+    N2 is N +1,
+    assert(estado(N2)).
 
 %imprime estado actual del juego
 imprime:-
-	estado(E),
-	display('Estado: '),display(E),nl,
-	t(control(X)),
-	display('Control: '),display(X),nl,
-	imprime_fila(1),
-	imprime_fila(2),
-	imprime_fila(3),
+  estado(E),
+  display('Estado: '),display(E),nl,
+  t(control(X)),
+  display('Control: '),display(X),nl,
+  imprime_fila(1),
+  imprime_fila(2),
+  imprime_fila(3),
   imprime_fila(4),
-	imprime_fila(5),
-	imprime_fila(6),
+  imprime_fila(5),
+  imprime_fila(6),
   imprime_fila(7),
-	imprime_fila(8),
-	imprime_fila(9),
+  imprime_fila(8),
+  imprime_fila(9),
   imprime_fila(10),
-	imprime_fila(11),
-	imprime_fila(12),
+  imprime_fila(11),
+  imprime_fila(12),
   imprime_fila(13),
-	imprime_fila(14),
-	imprime_fila(15),
+  imprime_fila(14),
+  imprime_fila(15),
   imprime_fila(16),
-	imprime_fila(17),
-	imprime_fila(18),
+  imprime_fila(17),
+  imprime_fila(18),
   imprime_fila(19),
-	imprime_fila(20),
-	display('********').
+  imprime_fila(20),
+  display('********').
 
 imprime_fila(N):-
 
@@ -946,36 +909,11 @@ imprime_fila(N):-
 
  
 
-%desarrollo jugador o      
-
-jugador(o,A):-
-
-legal(o,A).
+% Desarrollo jugador j1
+jugador(j1,A):- legal(j1,A).
 
  
+% Desarrollo jugador j2
+jugador(j2,X):- display('Ingrese próximo movimiento:'), read(X).
 
- 
 
-%desarrollo jugador x
-
-jugador(x,X):-
-
-%legal(x,X).
-
-display('Ingrese próximo movimiento:'),
-
-read(X).
-
-% display('Ingrese Marca en Y:'),
-
-% read_term(Y,[]).
-
-%
-
-/** <examples>
-
-?- inicio,juego.
-
-*/
-
-%
