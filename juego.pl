@@ -12,7 +12,7 @@
 % goal(r,n) el jugador r ha conseguido n (puntos utilidades) en el estado actual.
 % terminal el estado actual es terminal.
 
-:- dynamic serpiente/2, orientacion/2, t/1 , does/2.
+:- dynamic serpiente/4, orientacion/2, t/1 , does/2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Utilidades de Listas %
@@ -558,7 +558,8 @@ input(R,noop):-role(R).
 % Movimientos legales %
 %%%%%%%%%%%%%%%%%%%%%%%
 legal(J1,move(X)) :-
-  serpiente(J1,D,L), 
+  serpiente(J1,D,L,V),
+  V > 0, 
   allowed(D,X), 
   t(control(J1)).
 
