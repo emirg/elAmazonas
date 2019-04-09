@@ -88,8 +88,8 @@ isla(i).
 % Roles %
 %%%%%%%%%
 
-role(j1). %Charlie / Jugador 1
-role(j2). %Simon / Jugador 2
+role(c). %Charlie / Jugador 1
+role(s). %Simon / Jugador 2
 
 %%%%%%%%%%%%%%%%%%%%%%%
 % Limites del tablero %
@@ -510,11 +510,10 @@ init(cell(20,17,a)).
 init(cell(20,18,a)).
 init(cell(20,19,a)).
 init(cell(20,20,a)).
-init(serpiente(j1,left,[(2,17),(2,18),(2,19)],3)). % Charlie - serpiente/4: jugadorDueño,orientacion,[cabeza|cuerpo],vidas
-init(serpiente(j2,left,[(17,17),(17,18),(17,19)],3)). % Simon
-init(control(j1)). %Empieza jugando Charlie
+init(serpiente(c,left,[(2,17),(2,18),(2,19)],3)). % Charlie - serpiente/4: jugadorDueño,orientacion,[cabeza|cuerpo],vidas
+init(serpiente(s,left,[(17,17),(17,18),(17,19)],3)). % Simon
+init(control(c)). %Empieza jugando Charlie
 
- 
 
 %Proposiciones base
 base(control(X)):- role(X).
@@ -588,72 +587,52 @@ snakeMember([_|Tail],X,Y) :-
 
 % Las que no fueron afectadas, se quedan igual
 % Todavia hay que ver como hacer esto
-next(cell(M,N,a)) :-
-      t(cell(M,N,a)).
 
-next(cell(M,N,i)) :-
-      t(cell(M,N,i)).
-
-next(cell(M,N,b)) :-
-      t(cell(M,N,b)).
-  
-next(cell(M,N,c)) :-
-      t(cell(M,N,c)).
-
-next(cell(M,N,s)) :-
-      t(cell(M,N,s)).
-
-next(cell(M,N,p)) :-
-      t(cell(M,N,p)).
-
+lugar_donde_se_mueve(R,M,N):-
+  does(R,move(O)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
+  V > 0,
+  decrease(O,A,B),
+  M is X+A,
+  N is Y+B.
 
 %%%%%%%%  %%%%%%%%%%%
 % Mapa %  % REVISAR %
 %%%%%%%%  %%%%%%%%%%%
 
 % Si la serpiente se movio a un lugar con agua
-next(cell(M,N,j1)) :-
+next(cell(M,N,R)) :- 
   t(cell(M,N,a)),
-  does(j1,move(O)),
-  serpiente(j1,_,[(X,Y)|_],V),
-  V > 0,
-  decrease(O,A,B),
-  M is X+A,
-  N is Y+B.
-
-% Si la serpiente se mueve a una isla
-next(cell(M,N,j1)) :-
-  t(cell(M,N,i)),
-  does(j1,move(O)),
-  serpiente(j1,_,[(X,Y)|_],V),
+  does(R,move(O)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
   V > 0,
   decrease(O,A,B),
   M is X+A,
   N is Y+B.
 
 % Si la serpiente se come a una persona...
-next(cell(M,N,j1)) :-
+next(cell(M,N,R)) :-
   t(cell(M,N,p)),
-  does(j1,move(O)),
-  serpiente(j1,_,[(X,Y)|_],V),
+  does(R,move(O)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
   V > 0,
   decrease(O,A,B),
   M is X+A,
   N is Y+B.
 
 % Si la serpiente se movio el cuerpo queda igual (excepto cabeza y fin de cola)
-next(cell(M,N,j1)) :-
-  t(cell(M,N,j1)),
-  does(j1,move(_)),
-  serpiente(j1,_,S,V),
+next(cell(M,N,R)) :-
+  t(cell(M,N,R)),
+  does(R,move(_)),
+  t(serpiente(R,_,S,V)),
   V > 0,
   \+last(S,(M,N)).
 
 % Si la serpiente se movio, la cola ya no esta mas ocupando un espacio
 next(cell(M,N,a)) :-
-  t(cell(M,N,j1)),
-  does(j1,move(_)),
-  serpiente(j1,_,S,V),
+  t(cell(M,N,R)),
+  does(R,move(_)),
+  t(serpiente(R,_,S,V)),
   V > 0,
   last(S,(M,N)).
 
@@ -662,10 +641,10 @@ next(cell(M,N,a)) :-
 %%%%%%%%%%%%%   %%%%%%%%%%%
 
 % Si la serpiente se mueve a un agua
-next(serpiente(j1,D,S,V)):-
-  t(control(j1)),
-  does(j1,move(D)),
-  serpiente(j1,_,[(X,Y)|Sv],V),
+next(serpiente(R,D,S,V)):-
+  t(control(R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
   V > 0,
   decrease(D,A,B),
   removeLast([(X,Y)|Sv],L1),
@@ -675,10 +654,10 @@ next(serpiente(j1,D,S,V)):-
   addBegin((XCabezaNueva,YCabezaNueva),L1,S).
 
 % Si la serpiente se mueve a una isla
-next(serpiente(j1,D,S,0)):-
-  t(control(j1)),
-  does(j1,move(D)),
-  serpiente(j1,_,[(X,Y)|Sv],V),
+next(serpiente(R,D,S,0)):-
+  t(control(R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
   V > 0,
   decrease(D,A,B),
   removeLast([(X,Y)|Sv],L1),
@@ -689,10 +668,10 @@ next(serpiente(j1,D,S,0)):-
 
 
 % Si la serpiente se mueve a un barril
-next(serpiente(j1,D,S,V1)):-
-  t(control(j1)),
-  does(j1,move(D)),
-  serpiente(j1,_,[(X,Y)|Sv],V),
+next(serpiente(R,D,S,V1)):-
+  t(control(R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
   V > 0,
   V1 is V-1,
   decrease(D,A,B),
@@ -703,39 +682,75 @@ next(serpiente(j1,D,S,V1)):-
   addBegin((XCabezaNueva,YCabezaNueva),L1,S).
 
 % Si la serpiente si choca contra otra serpiente
-next(serpiente(j1,D,S,0)):-
-  t(control(j1)),
-  does(j1,move(D)),
-  serpiente(j1,_,[(X,Y)|Sv],V),
+next(serpiente(R,D,S,0)):-
+  t(control(R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
   V > 0,
   decrease(D,A,B),
   removeLast([(X,Y)|Sv],L1),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,j2)), % Deberia llevar el predicado t()?
+  t(cell(XCabezaNueva,YCabezaNueva,s)), % Deberia llevar el predicado t()?
   addBegin((XCabezaNueva,YCabezaNueva),L1,S).
 
 % Si la serpiente si choca contra otra serpiente
-next(serpiente(j1,D,S,V)):-
-  t(control(j1)),
-  does(j1,move(D)),
-  serpiente(j1,_,[(X,Y)|_],V),
+next(serpiente(R,D,S,V)):-
+  t(control(R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
   V > 0,
   decrease(D,A,B),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,j2)), % Deberia llevar el predicado t()?
+  t(cell(XCabezaNueva,YCabezaNueva,s)), % Deberia llevar el predicado t()?
   addBegin((XCabezaNueva,YCabezaNueva),_,S).
 
 
 
 
 % Cambio de turnos
-next(control(j1)) :-
-      t(control(j2)).
+next(control(c)) :-
+      t(control(s)).
 
-next(control(j2)) :-
-      t(control(j1)).
+next(control(s)) :-
+      t(control(c)).
+
+% El agua que no fue afectada, sigue siendo agua.
+next(cell(M,N,a)):-
+  t(cell(M,N,a)),
+  lugar_donde_se_mueve(_,Q,_W),
+  distinct(Q,M).
+
+next(cell(M,N,a)):-
+  t(cell(M,N,a)),
+  lugar_donde_se_mueve(_,_Q,W),
+  distinct(W,N).
+
+
+% La isla siempre es isla.
+next(cell(M,N,i)) :-
+  t(cell(M,N,i)).
+
+next(cell(M,N,J2)):-
+  role(J2),
+  t(control(J)),
+  t(cell(M,N,J2)),
+  distinct(J,J2).
+
+
+
+next(cell(M,N,b)) :-
+  t(cell(M,N,b)),
+  lugar_donde_se_mueve(_,Q,W),
+  (distinct(Q,M) ; distinct(W,N)).
+  
+next(cell(M,N,p)) :-
+  t(cell(M,N,p)),
+  lugar_donde_se_mueve(_,Q,W),
+  (distinct(Q,M) ; distinct(W,N)).
+
+
 
 %%%%%%%%%
 % Goals %
@@ -763,6 +778,17 @@ distinct(X,Y):- X\==Y.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% GESTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+test:-
+  inicio,
+  assert(does(c,move(left))),
+  assert(does(s,noop)).
+
+
+test2:-
+  proximo_estado,
+  retractall(t(_)),
+  crea_estado.
+
 
 inicio:-
     retractall(t(_)),
@@ -910,10 +936,10 @@ imprime_fila(N):-
  
 
 % Desarrollo jugador j1
-jugador(j1,A):- legal(j1,A).
+jugador(c,A):- legal(c,A).
 
  
 % Desarrollo jugador j2
-jugador(j2,X):- display('Ingrese próximo movimiento:'), read(X).
+jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
 
 
