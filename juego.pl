@@ -600,7 +600,53 @@ lugar_donde_se_mueve(R,M,N):-
 % Mapa %  % REVISAR %
 %%%%%%%%  %%%%%%%%%%%
 
-% Si la serpiente se movio a un lugar con agua
+% Celda -> Mantiene -> Isla
+next(cell(M,N,i)) :-
+  t(cell(M,N,i)).
+
+% Celda -> Mantiene -> Agua
+next(cell(M,N,a)):-
+  t(cell(M,N,a)),
+  lugar_donde_se_mueve(_,Q,W),
+  (distinct(Q,M);distinct(W,N)).
+
+% Celda -> Mantiene -> Barril
+next(cell(M,N,b)) :-
+  t(cell(M,N,b)),
+  lugar_donde_se_mueve(_,Q,W),
+  (distinct(Q,M) ; distinct(W,N)).
+
+% Celda -> Mantiene -> Persona  
+next(cell(M,N,p)) :-
+  t(cell(M,N,p)),
+  lugar_donde_se_mueve(_,Q,W),
+  (distinct(Q,M) ; distinct(W,N)).
+
+
+
+% Celda -> Mantiene -> Serpiente -> Cuerpo
+next(cell(M,N,R)) :-
+  t(cell(M,N,R)),
+  does(R,move(_)),
+  t(serpiente(R,_,S,V)),
+  V > 0,
+  \+last(S,(M,N)),
+  \+head(S,(M,N)).
+
+% Celda -> Mantiene -> Serpiente -> Cola -> Comio persona
+next(cell(M,N,R)) :-
+  t(cell(M,N,R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
+  V > 0,
+  last(S,(M,N)),  
+  decrease(D,A,B),
+  XCabezaNueva is X + A,
+  YCabezaNueva is Y + B,
+  t(cell(XCabezaNueva,YCabezaNueva,p)).
+
+
+% Celda -> Cambio -> Serpiente -> Cabeza -> Movio a agua
 next(cell(M,N,R)) :- 
   t(cell(M,N,a)),
   does(R,move(O)),
@@ -610,7 +656,7 @@ next(cell(M,N,R)) :-
   M is X+A,
   N is Y+B.
 
-% Si la serpiente se come a una persona...
+% Celda -> Cambio -> Serpiente -> Cabeza -> Comio persona
 next(cell(M,N,R)) :-
   t(cell(M,N,p)),
   does(R,move(O)),
@@ -620,27 +666,39 @@ next(cell(M,N,R)) :-
   M is X+A,
   N is Y+B.
 
-% Si la serpiente se movio el cuerpo queda igual (excepto cabeza y fin de cola)
+% Celda -> Cambio -> Serpiente -> Cabeza -> Comio barril
 next(cell(M,N,R)) :-
-  t(cell(M,N,R)),
-  does(R,move(_)),
-  t(serpiente(R,_,S,V)),
+  t(cell(M,N,b)),
+  does(R,move(O)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
   V > 0,
-  \+last(S,(M,N)).
+  decrease(O,A,B),
+  M is X+A,
+  N is Y+B.
 
-% Si la serpiente se movio, la cola ya no esta mas ocupando un espacio
+% Celda -> Cambio -> Serpiente -> Cola-> No comio persona
 next(cell(M,N,a)) :-
   t(cell(M,N,R)),
-  does(R,move(_)),
-  t(serpiente(R,_,S,V)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
   V > 0,
-  last(S,(M,N)).
+  last(S,(M,N)),  
+  decrease(D,A,B),
+  XCabezaNueva is X + A,
+  YCabezaNueva is Y + B,
+  t(cell(XCabezaNueva,YCabezaNueva,A)),
+  distinct(A,p).
+
+% Celda -> Mantiene -> SerpienteEnemiga 
+next(cell(M,N,J2)):-
+  does(J2,noop),
+  t(cell(M,N,J2)).
 
 %%%%%%%%%%%%%   %%%%%%%%%%%
 % Serpiente %   % REVISAR %
 %%%%%%%%%%%%%   %%%%%%%%%%%
 
-% Si la serpiente se mueve a un agua
+% Serpiente -> Movio -> Agua -> Cabeza/Cuerpo/Cola
 next(serpiente(R,D,S,V)):-
   t(control(R)),
   does(R,move(D)),
@@ -650,24 +708,21 @@ next(serpiente(R,D,S,V)):-
   removeLast([(X,Y)|Sv],L1),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,a)), % Deberia llevar el predicado t()?
+  t(cell(XCabezaNueva,YCabezaNueva,a)), 
   addBegin((XCabezaNueva,YCabezaNueva),L1,S).
 
-% Si la serpiente se mueve a una isla
-next(serpiente(R,D,S,0)):-
+% Serpiente -> Movio -> Isla -> Vida
+next(serpiente(R,D,_,0)):-
   t(control(R)),
   does(R,move(D)),
-  t(serpiente(R,_,[(X,Y)|Sv],V)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
   V > 0,
   decrease(D,A,B),
-  removeLast([(X,Y)|Sv],L1),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,i)), % Deberia llevar el predicado t()?
-  addBegin((XCabezaNueva,YCabezaNueva),L1,S).
+  t(cell(XCabezaNueva,YCabezaNueva,i)).
 
-
-% Si la serpiente se mueve a un barril
+% Serpiente -> Movio -> Barril -> Cabeza/Cuerpo/Cola
 next(serpiente(R,D,S,V1)):-
   t(control(R)),
   does(R,move(D)),
@@ -678,33 +733,45 @@ next(serpiente(R,D,S,V1)):-
   removeLast([(X,Y)|Sv],L1),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,b)), % Deberia llevar el predicado t()?
+  t(cell(XCabezaNueva,YCabezaNueva,b)), 
   addBegin((XCabezaNueva,YCabezaNueva),L1,S).
 
-% Si la serpiente si choca contra otra serpiente
+% Serpiente -> Movio -> SerpienteEnemiga -> Vida
 next(serpiente(R,D,S,0)):-
   t(control(R)),
   does(R,move(D)),
   t(serpiente(R,_,[(X,Y)|Sv],V)),
   V > 0,
   decrease(D,A,B),
-  removeLast([(X,Y)|Sv],L1),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,s)), % Deberia llevar el predicado t()?
-  addBegin((XCabezaNueva,YCabezaNueva),L1,S).
+  t(cell(XCabezaNueva,YCabezaNueva,R2)),
+  distinct(R,R2).
 
-% Si la serpiente si choca contra otra serpiente
+% Serpiente -> Movio -> Persona -> Cabeza/Cuerpo/Cola
 next(serpiente(R,D,S,V)):-
   t(control(R)),
   does(R,move(D)),
-  t(serpiente(R,_,[(X,Y)|_],V)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
   V > 0,
   decrease(D,A,B),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,s)), % Deberia llevar el predicado t()?
-  addBegin((XCabezaNueva,YCabezaNueva),_,S).
+  t(cell(XCabezaNueva,YCabezaNueva,p)), 
+  addBegin((XCabezaNueva,YCabezaNueva),L1,S).
+
+% Serpiente -> No se movio -> SerpienteEnemiga -> Vida
+next(serpiente(R2,D,S,0)):-
+  t(control(R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|Sv],V)),
+  V > 0,
+  decrease(D,A,B),
+  XCabezaNueva is X + A,
+  YCabezaNueva is Y + B,
+  t(cell(XCabezaNueva,YCabezaNueva,R2)),
+  distinct(R,R2).
+
 
 
 
@@ -715,40 +782,6 @@ next(control(c)) :-
 
 next(control(s)) :-
       t(control(c)).
-
-% El agua que no fue afectada, sigue siendo agua.
-next(cell(M,N,a)):-
-  t(cell(M,N,a)),
-  lugar_donde_se_mueve(_,Q,_W),
-  distinct(Q,M).
-
-next(cell(M,N,a)):-
-  t(cell(M,N,a)),
-  lugar_donde_se_mueve(_,_Q,W),
-  distinct(W,N).
-
-
-% La isla siempre es isla.
-next(cell(M,N,i)) :-
-  t(cell(M,N,i)).
-
-next(cell(M,N,J2)):-
-  role(J2),
-  t(control(J)),
-  t(cell(M,N,J2)),
-  distinct(J,J2).
-
-
-
-next(cell(M,N,b)) :-
-  t(cell(M,N,b)),
-  lugar_donde_se_mueve(_,Q,W),
-  (distinct(Q,M) ; distinct(W,N)).
-  
-next(cell(M,N,p)) :-
-  t(cell(M,N,p)),
-  lugar_donde_se_mueve(_,Q,W),
-  (distinct(Q,M) ; distinct(W,N)).
 
 
 
