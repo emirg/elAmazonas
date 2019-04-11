@@ -57,13 +57,13 @@ direccion(up).
 direccion(down).
 
 % Posiciones validas dada una direccion
-allowed(left,down) :- !.
-allowed(left,up) :- !.
-allowed(right,down) :- !.
-allowed(right,up) :- !.
-allowed(X,X) :- !,fail.
+allowed(left,down):- !.
+allowed(left,up):- !.
+allowed(right,down):- !.
+allowed(right,up):- !.
+allowed(X,X):- !.
 allowed(right,left) :- !,fail.
-allowed(up,down) :- !,fail.
+allowed(up,down) :- fail.
 allowed(X,Z) :- allowed(Z,X).
 
 % Posiciones opuestas
@@ -157,7 +157,7 @@ input(R,noop):-role(R).
 % Movimientos legales %
 %%%%%%%%%%%%%%%%%%%%%%%
 legal(J1,move(X)) :-
-  serpiente(J1,D,_,V),
+  t(serpiente(J1,D,_,V)),
   V > 0, 
   allowed(D,X), 
   t(control(J1)).
@@ -336,10 +336,10 @@ next(serpiente(R,D,S,V1)):-
   addBegin((XCabezaNueva,YCabezaNueva),L1,S).
 
 % Serpiente -> Movio -> SerpienteEnemiga -> Vida
-next(serpiente(R,D,S,0)):-
+next(serpiente(R,D,_,0)):-
   t(control(R)),
   does(R,move(D)),
-  t(serpiente(R,_,[(X,Y)|Sv],V)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
   V > 0,
   decrease(D,A,B),
   XCabezaNueva is X + A,
@@ -358,13 +358,13 @@ next(serpiente(R,D,S,V)):-
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
   t(cell(XCabezaNueva,YCabezaNueva,p)), 
-  addBegin((XCabezaNueva,YCabezaNueva),L1,S).
+  addBegin((XCabezaNueva,YCabezaNueva),[(X,Y)|Sv],S).
 
 next(serpiente(R,D,S,V)):-
   t(control(R2)),
+  distinct(R2,R),
   t(serpiente(R,D,S,V)),
-  does(R,noop),
-  distinct(R2,R).
+  does(R,noop).
 
 
 
@@ -388,7 +388,7 @@ next(control(s)) :-
 
 goal(_,0).
 
-terminal :- serpiente(_,_,_,0). % Si una serpiente muere entonces termina el juego.
+terminal :- t(serpiente(_,_,_,0)). % Si una serpiente muere entonces termina el juego.
 
 terminal :- \+open. % Si no hay mas personas termina el juego
 
@@ -407,7 +407,7 @@ distinct(X,Y):- X\==Y.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% GESTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 test:-
   inicio,
-  assert(does(c,move(right))),
+  assert(does(c,move(up))),
   assert(does(s,noop)).
 
 
@@ -497,7 +497,7 @@ crea_estado:-
 
 crea_estado:-
     retract(estado(N)),
-    N2 is N +1,
+    N2 is N+1,
     assert(estado(N2)).
 
 %imprime estado actual del juego
