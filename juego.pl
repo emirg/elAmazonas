@@ -94,8 +94,7 @@ role(s). %Simon / Jugador 2
 %%%%%%%%%%%%%%%%%%%%%%%
 % Limites del tablero %
 %%%%%%%%%%%%%%%%%%%%%%%
-% Tal vez tengamos que achicar el tablero
-limites_tablero(20,20). %(cantidad_filas,cantidad_columnas)
+limites_tablero(10,10). %(cantidad_filas,cantidad_columnas)
 cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 
 
@@ -407,7 +406,7 @@ distinct(X,Y):- X\==Y.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% GESTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 test:-
   inicio,
-  assert(does(c,move(up))),
+  assert(does(c,move(right))),
   assert(does(s,noop)).
 
 
@@ -563,7 +562,7 @@ imprime_fila(N):-
  
 
 % Desarrollo jugador j1
-jugador(c,A):- legal(c,A).
+jugador(c,move(right)):- legal(c,move(right)).
 
  
 % Desarrollo jugador j2

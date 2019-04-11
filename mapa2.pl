@@ -110,4 +110,4 @@ init(cell(10,9,a)).
 init(cell(10,10,a)).
 
 init(serpiente(c,right,[(2,3),(2,2),(2,1)],3)). % Charlie - serpiente/4: jugadorDueño,orientacion,[cabeza|cuerpo],vidas
-init(serpiente(s,left,[(8,8),(8,9),(8,10)],3)). % Simon
+init(serpiente(s,left,[(9,8),(9,9),(9,10)],3)). % Simon
