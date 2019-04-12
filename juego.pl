@@ -12,7 +12,7 @@
 % goal(r,n) el jugador r ha conseguido n (puntos utilidades) en el estado actual.
 % terminal el estado actual es terminal.
 
-:-dynamic t/1,h/2,hs/2,estado/1,does/2,serpiente/4,control/1.
+:-dynamic t/1,h/2,hs/2,estado/1,does/2,serpiente/4,control/1,score/2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Utilidades de Listas %
@@ -109,7 +109,19 @@ cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 %   s -> Serpiente 1
 %   c-> Serpiente 2
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% asigno mapa %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 :- include('mapa2.pl').
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% Puntacion inicial %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+init(score(c,0)).
+init(score(s,0)).
+
 init(control(c)). %Empieza jugando Charlie
 
 
@@ -121,6 +133,7 @@ base(cell(X,Y,b)):- index(X),index(Y).
 base(cell(X,Y,p)):- index(X),index(Y).
 base(cell(X,Y,R)):- role(R),index(X),index(Y).
 base(serpiente(R,D,L,V)):- role(R), direccion(D),is_list(L),V>0.
+%base(score(R,Valor)):- role(R), Valor >= 0.
 
 index(1).
 index(2).
@@ -361,7 +374,7 @@ next(serpiente(R,D,S,V)):-
   decrease(D,A,B),
   XCabezaNueva is X + A,
   YCabezaNueva is Y + B,
-  t(cell(XCabezaNueva,YCabezaNueva,p)), 
+  t(cell(XCabezaNueva,YCabezaNueva,p)),
   addBegin((XCabezaNueva,YCabezaNueva),[(X,Y)|Sv],S).
 
 next(serpiente(R,D,S,V)):-
@@ -370,9 +383,21 @@ next(serpiente(R,D,S,V)):-
   t(serpiente(R,D,S,V)),
   does(R,noop).
 
-
-
-
+next(score(Rol,Puntos)):-
+    role(Rol),
+    t(score(Rol, Puntos)),
+    t(cell(_,_,A)),
+    distinct(A,p).
+    
+% si come per 10 puntos
+next(score(Rol,P)):-
+  role(Rol),
+  t(score(Rol,P1)),
+  t(cell(M,N,p)),
+  lugar_donde_se_mueve(Rol,Q,W),
+  (M==Q),
+  (N==W),
+  P is P1+10.
 
 % Cambio de turnos
 next(control(c)) :-
@@ -390,7 +415,33 @@ next(control(s)) :-
 % Hay que ver todavia como suma puntos el jugador (supong que comiendo gente)
 % y como mantener ese dato (eso es lo de menos, deberia ser facil)
 
-goal(_,0).
+goal(c,Puntaje):-
+  role(c),
+  role(s),
+  t(score(c,Puntaje_c)),
+  t(score(s,Puntaje_s)),
+  Puntaje is Puntaje_c-Puntaje_s.
+
+goal(s,Puntaje):-
+  role(c),
+  role(s),
+  t(score(c,Puntaje_c)),
+  t(score(s,Puntaje_s)),
+  Puntaje is Puntaje_s-Puntaje_c. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Finaliza %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+terminal:-
+  role(s),
+  t(score(s,10)).
+
+terminal:-
+  role(c),
+  t(score(c,10)).
+
+terminal :- estado(20).
 
 terminal :- t(serpiente(_,_,_,0)). % Si una serpiente muere entonces termina el juego.
 
@@ -462,11 +513,11 @@ juego:-
     nl,
     display('El juego termino'),
     nl,
-    goal(h,Px),
-    goal(e,Po),
-    display('Heinrich obtuvo '),
+    goal(s,Po),
+    goal(c,Px),
+    display('Charlie obtuvo '),
     display(Px),
-    display(' puntos y el enemigo obtuvo '),
+    display(' puntos y el Simon obtuvo '),
     display(Po),
     display(' puntos.').
 
@@ -568,9 +619,12 @@ imprime_fila(N):-
 
 % Desarrollo jugador j1
 jugador(c,move(right)):- legal(c,move(right)).
-
+%jugador(c,noop):- legal(c,noop).
  
 % Desarrollo jugador j2
 jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
+
+
+
 
 
