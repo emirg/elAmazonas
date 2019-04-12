@@ -415,19 +415,10 @@ next(control(s)) :-
 % Hay que ver todavia como suma puntos el jugador (supong que comiendo gente)
 % y como mantener ese dato (eso es lo de menos, deberia ser facil)
 
-goal(c,Puntaje):-
-  role(c),
-  role(s),
-  t(score(c,Puntaje_c)),
-  t(score(s,Puntaje_s)),
-  Puntaje is Puntaje_c-Puntaje_s.
+goal(Rol,Puntaje):-
+  role(Rol),
+  t(score(Rol,Puntaje)).
 
-goal(s,Puntaje):-
-  role(c),
-  role(s),
-  t(score(c,Puntaje_c)),
-  t(score(s,Puntaje_s)),
-  Puntaje is Puntaje_s-Puntaje_c. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -623,8 +614,5 @@ jugador(c,move(right)):- legal(c,move(right)).
  
 % Desarrollo jugador j2
 jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
-
-
-
 
 
