@@ -155,14 +155,19 @@ input(R,noop):-role(R).
 %%%%%%%%%%%%%%%%%%%%%%%
 % Movimientos legales %
 %%%%%%%%%%%%%%%%%%%%%%%
-legal(J1,move(X)) :-
-  t(serpiente(J1,D,_,V)),
+legal(J1,move(M)) :-
+  t(serpiente(J1,D,[(X,Y)|_],V)),
   V > 0, 
-  allowed(D,X), 
+  allowed(D,M),   
+  decrease(M,A,B),
+  L1 is X+A,
+  L2 is Y+B,
+  limites_tablero(LX,LY), L1>0, L1=<LX, L2>0, L2=<LY,
   t(control(J1)).
 
 legal(J2,noop) :-
   role(J1),
+  \+control(J2),
   distinct(J1,J2).
 
 % Posiblemente no la necesitemos
