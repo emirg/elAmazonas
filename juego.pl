@@ -183,6 +183,20 @@ legal(J2,noop) :-
   \+control(J2),
   distinct(J1,J2).
 
+legal(Rol,move(M)):-
+  role(Rol),
+  t(serpiente(Rol,D,[(X,Y)|_],V)),
+  V > 0, 
+  allowed(D,M),   
+  decrease(M,A,B),
+  L1 is X+A,
+  L2 is Y+B,
+  limites_tablero(LX,LY), 
+  \+(L1>0, L1=<LX, L2>0, L2=<LY),
+  M is noop,
+  t(control(Rol)).
+
+
 % Posiblemente no la necesitemos
 can_move(R,(X1,Y1),(X2,Y2)):- 
   orientacion(R,A,B), 
