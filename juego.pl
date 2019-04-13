@@ -94,7 +94,7 @@ role(s). %Simon / Jugador 2
 %%%%%%%%%%%%%%%%%%%%%%%
 % Limites del tablero %
 %%%%%%%%%%%%%%%%%%%%%%%
-limites_tablero(10,10). %(cantidad_filas,cantidad_columnas)
+limites_tablero(12,12). %(cantidad_filas,cantidad_columnas)
 cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 
 
@@ -113,7 +113,7 @@ cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 %%%%%%%%%%%% asigno mapa %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- include('mapa2.pl').
+:- include('mapaConParedes.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Puntacion inicial %%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,6 +135,7 @@ base(cell(X,Y,R)):- role(R),index(X),index(Y).
 base(serpiente(R,D,L,V)):- role(R), direccion(D),is_list(L),V>0.
 base(score(R,Valor)):- role(R), Valor >= 0.
 
+index(0).
 index(1).
 index(2).
 index(3).
@@ -145,8 +146,9 @@ index(7).
 index(8).
 index(9).
 index(10).
-/*
 index( 11 ).
+/*
+
 index( 12 ).
 index( 13 ).
 index( 14 ).
@@ -413,7 +415,7 @@ next(control(s)) :-
 %%%%%%%%%%%%%%%%%%%%%%%%% correccion %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% nunca entra mismo problema de antes no llama al next movimiento invalido
-
+%%ya no sirve
 % Serpiente -> Movio -> Pared -> Vida
 next(serpiente(R,D,_,0)):-
   t(control(R)),
@@ -424,7 +426,7 @@ next(serpiente(R,D,_,0)):-
   X2 is X + A,
   Y2 is Y + B,
   limites_tablero(LX,LY), 
-  (X2<0; X2>LX; Y2<0; Y2>LY),
+  (X2<0; X2>LX; Y2<0; Y2>LY).
 
 %%%%%%%%%
 % Goals %
@@ -567,6 +569,7 @@ imprime:-
   display('Charlie '),t(serpiente(c,_,_,V2)),display(V2),display(' vidas') ,nl,
   display('Puntaje Simon: '),t(score(s,P1)),display(P1),nl,
   display('Puntaje Charlie: '),t(score(c,P2)),display(P2),nl,
+  imprime_fila(0),
   imprime_fila(1),
   imprime_fila(2),
   imprime_fila(3),
@@ -576,8 +579,8 @@ imprime:-
   imprime_fila(7),
   imprime_fila(8),
   imprime_fila(9),
-  imprime_fila(10),/*
-  imprime_fila(11),
+  imprime_fila(10),
+  imprime_fila(11),/*
   imprime_fila(12),
   imprime_fila(13),
   imprime_fila(14),
@@ -591,13 +594,13 @@ imprime:-
 
 imprime_fila(N):-
 
-    t(cell(N,1,C1)),t(cell(N,2,C2)),t(cell(N,3,C3)),
+    t(cell(N,0,C0)),t(cell(N,1,C1)),t(cell(N,2,C2)),t(cell(N,3,C3)),
 
     t(cell(N,4,C4)),t(cell(N,5,C5)),t(cell(N,6,C6)),
 
     t(cell(N,7,C7)),t(cell(N,8,C8)),t(cell(N,9,C9)),
 
-    t(cell(N,10,C10)),/*t(cell(N,11,C11)),t(cell(N,12,C12)),
+    t(cell(N,10,C10)),t(cell(N,11,C11)),/*t(cell(N,12,C12)),
 
     t(cell(N,13,C13)),t(cell(N,14,C14)),t(cell(N,15,C15)),
 
@@ -605,13 +608,13 @@ imprime_fila(N):-
 
     t(cell(N,19,C19)),t(cell(N,20,C20)),*/
 
-    display(C1),display(C2),display(C3),
+    display(C0),display(C1),display(C2),display(C3),
 
     display(C4),display(C5),display(C6),
 
     display(C7),display(C8),display(C9),
 
-    display(C10),/*display(C11),display(C12),
+    display(C10),display(C11),/*display(C12),
 
     display(C13),display(C14),display(C15),
 
