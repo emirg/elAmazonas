@@ -133,7 +133,7 @@ base(cell(X,Y,b)):- index(X),index(Y).
 base(cell(X,Y,p)):- index(X),index(Y).
 base(cell(X,Y,R)):- role(R),index(X),index(Y).
 base(serpiente(R,D,L,V)):- role(R), direccion(D),is_list(L),V>0.
-%base(score(R,Valor)):- role(R), Valor >= 0.
+base(score(R,Valor)):- role(R), Valor >= 0.
 
 index(1).
 index(2).
@@ -201,9 +201,6 @@ snakeMember([_|Tail],X,Y) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % OBTENCION DEL PROXIMO ESTADO %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Las que no fueron afectadas, se quedan igual
-% Todavia hay que ver como hacer esto
 
 lugar_donde_se_mueve(R,M,N):-
   does(R,move(O)),
@@ -383,20 +380,26 @@ next(serpiente(R,D,S,V)):-
   t(serpiente(R,D,S,V)),
   does(R,noop).
 
+% Si no se mueve -> No gana puntos
 next(score(Rol,Puntos)):-
-    role(Rol),
-    t(score(Rol, Puntos)),
-    t(cell(_,_,A)),
-    distinct(A,p).
-    
-% si come per 10 puntos
+  role(Rol),
+  t(score(Rol,Puntos)),
+  does(Rol,noop).
+
+% Si se mueve y no come persona -> No gana puntos
+next(score(Rol,P)):-
+  role(Rol),
+  t(score(Rol,P)),
+  lugar_donde_se_mueve(Rol,M,N),
+  t(cell(M,N,A)),
+  distinct(A,p).
+
+% Si come persona -> 10 puntos
 next(score(Rol,P)):-
   role(Rol),
   t(score(Rol,P1)),
+  lugar_donde_se_mueve(Rol,M,N),
   t(cell(M,N,p)),
-  lugar_donde_se_mueve(Rol,Q,W),
-  (M==Q),
-  (N==W),
   P is P1+10.
 
 % Cambio de turnos
@@ -424,15 +427,10 @@ goal(Rol,Puntaje):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Finaliza %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-terminal:-
-  role(s),
-  t(score(s,10)).
 
-terminal:-
-  role(c),
-  t(score(c,10)).
 
-terminal :- estado(20).
+
+%terminal :- estado(7).
 
 terminal :- t(serpiente(_,_,_,0)). % Si una serpiente muere entonces termina el juego.
 
@@ -508,7 +506,7 @@ juego:-
     goal(c,Px),
     display('Charlie obtuvo '),
     display(Px),
-    display(' puntos y el Simon obtuvo '),
+    display(' puntos y Simon obtuvo '),
     display(Po),
     display(' puntos.').
 
@@ -552,6 +550,10 @@ imprime:-
   display('Estado: '),display(E),nl,
   t(control(X)),
   display('Control: '),display(X),nl,
+  display('Simon '),t(serpiente(s,_,_,V1)),display(V1),display(' vidas') ,nl,
+  display('Charlie '),t(serpiente(c,_,_,V2)),display(V2),display(' vidas') ,nl,
+  display('Puntaje Simon: '),t(score(s,P1)),display(P1),nl,
+  display('Puntaje Charlie: '),t(score(c,P2)),display(P2),nl,
   imprime_fila(1),
   imprime_fila(2),
   imprime_fila(3),
