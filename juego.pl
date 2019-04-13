@@ -183,20 +183,6 @@ legal(J2,noop) :-
   \+control(J2),
   distinct(J1,J2).
 
-legal(Rol,movimiento):-
-  role(Rol),
-  t(serpiente(Rol,D,[(X,Y)|_],V)),
-  V > 0, 
-  allowed(D,M),   
-  decrease(M,A,B),
-  L1 is X+A,
-  L2 is Y+B,
-  limites_tablero(LX,LY), 
-  (L1<0; L1>=LX; L2<0; L2>=LY),
-  movimiento is noop,
-  t(control(Rol)).
-
-
 % Posiblemente no la necesitemos
 can_move(R,(X1,Y1),(X2,Y2)):- 
   orientacion(R,A,B), 
@@ -423,7 +409,22 @@ next(control(c)) :-
 next(control(s)) :-
       t(control(c)).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% correccion %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% nunca entra mismo problema de antes no llama al next movimiento invalido
 
+% Serpiente -> Movio -> Pared -> Vida
+next(serpiente(R,D,_,0)):-
+  t(control(R)),
+  does(R,move(D)),
+  t(serpiente(R,_,[(X,Y)|_],V)),
+  V > 0,
+  decrease(D,A,B),
+  X2 is X + A,
+  Y2 is Y + B,
+  limites_tablero(LX,LY), 
+  (X2<0; X2>LX; Y2<0; Y2>LY),
 
 %%%%%%%%%
 % Goals %
@@ -441,9 +442,7 @@ goal(Rol,Puntaje):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Finaliza %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
+           
 terminal :- estado(25).
 
 terminal :- t(serpiente(_,_,_,0)). % Si una serpiente muere entonces termina el juego.
@@ -626,7 +625,10 @@ imprime_fila(N):-
 
 % Desarrollo jugador j1
 jugador(c,move(right)):- legal(c,move(right)).
-%jugador(c,noop):- legal(c,noop).
+
+jugador(c,move(down)):- legal(c,move(down)).
+
+jugador(c,move(A)):- legal(c,move(A)).
  
 % Desarrollo jugador j2
 jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
