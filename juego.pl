@@ -183,7 +183,7 @@ legal(J2,noop) :-
   \+control(J2),
   distinct(J1,J2).
 
-legal(Rol,move(M)):-
+legal(Rol,movimiento):-
   role(Rol),
   t(serpiente(Rol,D,[(X,Y)|_],V)),
   V > 0, 
@@ -192,8 +192,8 @@ legal(Rol,move(M)):-
   L1 is X+A,
   L2 is Y+B,
   limites_tablero(LX,LY), 
-  \+(L1>0, L1=<LX, L2>0, L2=<LY),
-  M is noop,
+  (L1<0; L1>=LX; L2<0; L2>=LY),
+  movimiento is noop,
   t(control(Rol)).
 
 
@@ -444,7 +444,7 @@ goal(Rol,Puntaje):-
 
 
 
-%terminal :- estado(7).
+terminal :- estado(25).
 
 terminal :- t(serpiente(_,_,_,0)). % Si una serpiente muere entonces termina el juego.
 
