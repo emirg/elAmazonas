@@ -33,16 +33,20 @@ last([Head|[]],Head).
 last([_|Tail],Head) :-
     last(Tail,Head).
 
+% in/2 - in(Elem, List).
+% Retorna si un elemento pertenece a una lista
 in(_,[]):- !, fail.
 in(X,[X|_]):- !.
 in(X,[_|L]):- in(X,L).
 
+% addBegin/3 - addBegin(Elem, List, List).
 addBegin(X,L,R):- append([X],L,R).
 
+% addEnd/3 - addEnd(Elem, List, List).
 addEnd(X,L,R):- append(L,[X],R).
 
+% removeLast/2 - removeLast(List, List).
 removeLast([X|Xs], Ys) :- removeLastAux(Xs, Ys, X).           
-
 removeLastAux([], [], _).
 removeLastAux([X1|Xs], [X0|Ys], X0) :- removeLastAux(Xs, Ys, X1). 
 
@@ -78,7 +82,7 @@ decrease(right,0,1).
 decrease(up,-1,0).
 decrease(down,1,0).
 
-% No creo que los usemos pero por las dudas...
+% Predicados para establecer los valores posibles. (No se usa)
 agua(a).
 barril(b).
 persona(p).
@@ -110,13 +114,13 @@ cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 %   c-> Serpiente 2
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%% asigno mapa %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% Asigno mapa %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- include('mapaConParedes.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%% Puntacion inicial %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Puntacion inicial %%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 init(score(c,0)).
@@ -146,9 +150,8 @@ index(7).
 index(8).
 index(9).
 index(10).
-index( 11 ).
+index(11).
 /*
-
 index( 12 ).
 index( 13 ).
 index( 14 ).
@@ -159,6 +162,7 @@ index( 18 ).
 index( 19 ).
 index( 20 ).
 */
+
 %%%%%%%%%%
 % Inputs %
 %%%%%%%%%%
@@ -192,7 +196,6 @@ can_move(R,(X1,Y1),(X2,Y2)):-
   Y2 is Y1 + B,
   limites_tablero(LX,LY), X2>0, X2=<LX, Y2>0, Y2=<LY.
 
-
 % snakeMember / 3 - snakeMember (Snake, XPoint, YPoint)
 % Comprueba si el punto (X,Y) pertenece a la serpiente
 snakeMember([],_,_) :- !, fail.
@@ -212,9 +215,9 @@ lugar_donde_se_mueve(R,M,N):-
   M is X+A,
   N is Y+B.
 
-%%%%%%%%  %%%%%%%%%%%
-% Mapa %  % REVISAR %
-%%%%%%%%  %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+%%%%%%%%%%%%% Mapa %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
 
 % Celda -> Mantiene -> Isla
 next(cell(M,N,i)) :-
@@ -309,9 +312,9 @@ next(cell(M,N,J2)):-
   does(J2,noop),
   t(cell(M,N,J2)).
 
-%%%%%%%%%%%%%   %%%%%%%%%%%
-% Serpiente %   % REVISAR %
-%%%%%%%%%%%%%   %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+%%%%%%%%%%%%% Serpiente %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Serpiente -> Movio -> Agua -> Cabeza/Cuerpo/Cola
 next(serpiente(R,D,S,V)):-
@@ -382,6 +385,10 @@ next(serpiente(R,D,S,V)):-
   t(serpiente(R,D,S,V)),
   does(R,noop).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% Puntaje %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Si no se mueve -> No gana puntos
 next(score(Rol,Puntos)):-
   role(Rol),
@@ -404,7 +411,9 @@ next(score(Rol,P)):-
   t(cell(M,N,p)),
   P is P1+10.
 
-% Cambio de turnos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% Turnos %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 next(control(c)) :-
       t(control(s)).
 
@@ -412,7 +421,7 @@ next(control(s)) :-
       t(control(c)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%% correccion %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% Correccion %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% nunca entra mismo problema de antes no llama al next movimiento invalido
 %%ya no sirve
@@ -432,20 +441,17 @@ next(serpiente(R,D,_,0)):-
 % Goals %
 %%%%%%%%%
 
-% Hay que ver todavia como suma puntos el jugador (supong que comiendo gente)
-% y como mantener ese dato (eso es lo de menos, deberia ser facil)
-
 goal(Rol,Puntaje):-
   role(Rol),
   t(score(Rol,Puntaje)).
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Finaliza %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Finaliza %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
            
-terminal :- estado(25).
+% terminal :- estado(25). % Para testing
 
 terminal :- t(serpiente(_,_,_,0)). % Si una serpiente muere entonces termina el juego.
 
@@ -458,12 +464,10 @@ distinct(X,Y):- X\==Y.
  
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DE ACA EN ADELANTE ESTA SIN TOCAR %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GESTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GESTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 test:-
   inicio,
   assert(does(c,move(right))),
@@ -627,7 +631,9 @@ imprime_fila(N):-
  
 
 % Desarrollo jugador j1
-jugador(c,move(right)):- legal(c,move(right)).
+% jugador(c,noop). % Se rompe 
+
+jugador(c,move(right)):- legal(c,move(right)). % Siempre unifica con este
 
 jugador(c,move(down)):- legal(c,move(down)).
 
@@ -637,3 +643,10 @@ jugador(c,move(A)):- legal(c,move(A)).
 jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% Agente Propio %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% Agente Externo %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
