@@ -60,13 +60,29 @@ direccion(right).
 direccion(up).
 direccion(down).
 
+% Mapeo direcciones a enteros
+mapeoDireccion(1,down).
+mapeoDireccion(2,right).
+mapeoDireccion(3,left).
+mapeoDireccion(4,up).
+
 % Posiciones validas dada una direccion
-allowed(left,down):- !.
+/*allowed(left,down):- !.
 allowed(left,up):- !.
 allowed(right,down):- !.
 allowed(right,up):- !.
 allowed(X,X):- !.
 allowed(right,left) :- !,fail.
+allowed(up,down) :- fail.
+allowed(X,Z) :- allowed(Z,X).*/
+
+
+allowed(left,down).
+allowed(left,up).
+allowed(right,down).
+allowed(right,up).
+allowed(X,X):- !.
+allowed(right,left) :- fail.
 allowed(up,down) :- fail.
 allowed(X,Z) :- allowed(Z,X).
 
@@ -633,12 +649,20 @@ imprime_fila(N):-
 % Desarrollo jugador j1
 % jugador(c,noop). % Se rompe 
 
+jugador(c,move(X)):-
+    nl,display('Ingresa proximo movimiento de Charlie:'),
+    agente2(c,X),
+    display(X),
+    nl.
+
+/*
 jugador(c,move(right)):- legal(c,move(right)). % Siempre unifica con este
 
 jugador(c,move(down)):- legal(c,move(down)).
 
 jugador(c,move(A)):- legal(c,move(A)).
- 
+*/
+
 % Desarrollo jugador j2
 jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
 
@@ -647,6 +671,19 @@ jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
 %%%%%%%%%%%%% Agente Propio %%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%% Agente Externo %%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Agente 1 (Especifico de dominio)
+% Busca una accion random y si es legal que la haga entonces la hace.
+agente1(Rol,A):- random(1,5,Random), mapeoDireccion(Random,M) ,t(control(Rol)), legal(Rol,move(M)), A = move(M),!.
+
+% Agente 2 (Especifico de dominio)
+%
+:- include('agente.pl').
+
+% Agente 3 (Generico)
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% Agentes Externos %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
