@@ -1,15 +1,15 @@
 agente2(Rol,MejorAccion):- 
   t(control(Rol)), 
   getPersonaCercana((X,Y),_D),
-  getAccionesLegales([],AccionesLegales),
-  write('Acciones validas: '),write(AccionesLegales),nl,
+  %getAccionesLegales([],AccionesLegales),
+  %write('Acciones validas: '),write(AccionesLegales),nl,
   getVecinosValidos((X,Y),[],VecinosValidos),
   write('Vecinos validos: '),write(VecinosValidos),nl,
   getMejorAccion(VecinosValidos,_,200,MejorAccion,_),
   write('Mejor accion: '),write(MejorAccion),nl.
   
 
-
+% Obtiene las acciones legales a realizar en el estado
 getAccionesLegales(L0,L1) :-
   t(control(J)),
   legal(J,A),
@@ -19,11 +19,12 @@ getAccionesLegales(L0,L1) :-
 
 getAccionesLegales(L,L).
 
-
+% Obtiene la distancia de un punto a otro
 distancia((X1,Y1),(X2,Y2),D) :-
   D is (abs(X1 - X2) + abs(Y1 -Y2)).
 
 
+% Obtiene los vecinos validos (es decir, que sean agua o persona y que esten en direccion correcta)
 getVecinosValidos((XP,YP),L0,L1):-
   %write('Xpersona  '),write(XP),nl,
   %write('Ypersona  '),write(YP),nl,
@@ -52,7 +53,7 @@ getVecinosValidos((XP,YP),L0,L1):-
 getVecinosValidos((_XP,_YP),L0,L0).
 
 
-
+% Obtiene la persona mas cercana de la cabeza de la serpiente
 getPersonaCercana((XP,YP),D):-
   t(control(Rol)),
   t(serpiente(Rol,_,[(X,Y)|_],_)),
@@ -78,7 +79,7 @@ getPersonaCercanaAux((_X,_Y),L,L).
 
 
 
-%Obtiene de una lista, la mejor acción.
+% Obtiene de una lista, la mejor acción.
 getMejorAccion([(_X,_Y,Accion,0)|_R],_,_MenorDistanciaParcial,Accion,_MenorDistancia).
 
 getMejorAccion([(_,_,Accion,Distancia)|R],_,MenorDistanciaParcial,MejorAccion,MenorDistancia):-

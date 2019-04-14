@@ -40,8 +40,8 @@ init(cell(2,11,i)).
 
 init(cell(3,0,i)).
 init(cell(3,1,a)).
-init(cell(3,2,i)).
-init(cell(3,3,i)).
+init(cell(3,2,a)).
+init(cell(3,3,a)).
 init(cell(3,4,a)).
 init(cell(3,5,a)).
 init(cell(3,6,a)).

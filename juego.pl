@@ -685,7 +685,9 @@ agente1(Rol,A):-
   A = move(M),!.
 
 % Agente 2 (Especifico de dominio)
-%
+% Busca la persona mas cercana, y una vez localizada se mueve al vecino
+% mas cercano a esa persona y asi sucesivamente. 
+% Esquiva barriles, islas/paredes y otras serpientes
 :- include('agente.pl').
 
 % Agente 3 (Generico)
