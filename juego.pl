@@ -76,7 +76,7 @@ allowed(right,left) :- !,fail.
 allowed(up,down) :- fail.
 allowed(X,Z) :- allowed(Z,X).*/
 
-
+%%%faltaban allowed casos de down y up
 allowed(left,down).
 allowed(left,up).
 allowed(right,down).
