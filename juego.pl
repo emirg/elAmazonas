@@ -81,6 +81,10 @@ allowed(left,down).
 allowed(left,up).
 allowed(right,down).
 allowed(right,up).
+allowed(down,left).
+allowed(down,right).
+allowed(up,left).
+allowed(up,right).
 allowed(X,X):- !.
 allowed(right,left) :- fail.
 allowed(up,down) :- fail.
@@ -441,6 +445,7 @@ next(control(s)) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% nunca entra mismo problema de antes no llama al next movimiento invalido
 %%ya no sirve
+/*
 % Serpiente -> Movio -> Pared -> Vida
 next(serpiente(R,D,_,0)):-
   t(control(R)),
@@ -452,7 +457,7 @@ next(serpiente(R,D,_,0)):-
   Y2 is Y + B,
   limites_tablero(LX,LY), 
   (X2<0; X2>LX; Y2<0; Y2>LY).
-
+*/
 %%%%%%%%%
 % Goals %
 %%%%%%%%%
@@ -654,15 +659,14 @@ jugador(c,move(X)):-
     agente2(c,X),
     display(X),
     nl.
-
+% para probar agente vs agente termina en estado 31 con un empate 
 /*
-jugador(c,move(right)):- legal(c,move(right)). % Siempre unifica con este
-
-jugador(c,move(down)):- legal(c,move(down)).
-
-jugador(c,move(A)):- legal(c,move(A)).
+jugador(s,move(X)):-
+    nl,display('Ingresa proximo movimiento de Charlie:'),
+    agente2(s,X),
+    display(X),
+    nl.
 */
-
 % Desarrollo jugador j2
 jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
 
@@ -673,7 +677,12 @@ jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
 
 % Agente 1 (Especifico de dominio)
 % Busca una accion random y si es legal que la haga entonces la hace.
-agente1(Rol,A):- random(1,5,Random), mapeoDireccion(Random,M) ,t(control(Rol)), legal(Rol,move(M)), A = move(M),!.
+agente1(Rol,A):- 
+  random(1,5,Random), 
+  mapeoDireccion(Random,M),
+  t(control(Rol)),
+  legal(Rol,move(M)),
+  A = move(M),!.
 
 % Agente 2 (Especifico de dominio)
 %
