@@ -462,9 +462,11 @@ next(serpiente(R,D,_,0)):-
 % Goals %
 %%%%%%%%%
 
-goal(Rol,Puntaje):-
+goal(Rol,Goal):-
   role(Rol),
-  t(score(Rol,Puntaje)).
+  t(score(Rol,Puntaje)),
+  t(serpiente(Rol,_,_,Vidas)),
+  Goal is Puntaje + Vidas.
 
 
 
@@ -654,9 +656,9 @@ imprime_fila(N):-
 % Desarrollo jugador j1
 % jugador(c,noop). % Se rompe 
 
-jugador(c,move(X)):-
+jugador(c,X):-
     nl,display('Ingresa proximo movimiento de Charlie:'),
-    agente2(c,X),
+    agenteGen(X),
     display(X),
     nl.
 % para probar agente vs agente termina en estado 31 con un empate 
@@ -688,10 +690,10 @@ agente1(Rol,A):-
 % Busca la persona mas cercana, y una vez localizada se mueve al vecino
 % mas cercano a esa persona y asi sucesivamente. 
 % Esquiva barriles, islas/paredes y otras serpientes
-:- include('agente.pl').
+%:- include('agente.pl').
 
 % Agente 3 (Generico)
-
+:- include('agenteGenerico.pl').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
