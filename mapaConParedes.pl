@@ -17,8 +17,8 @@ init(cell(1,1,a)).
 init(cell(1,2,a)).
 init(cell(1,3,a)).
 init(cell(1,4,a)).
-init(cell(1,5,a)).
-init(cell(1,6,a)).
+init(cell(1,5,i)). % Sacar esta y la siguiente para un juego mas "tranquilo"
+init(cell(1,6,i)).
 init(cell(1,7,p)).
 init(cell(1,8,a)).
 init(cell(1,9,a)).
@@ -43,7 +43,7 @@ init(cell(3,1,a)).
 init(cell(3,2,a)).
 init(cell(3,3,a)).
 init(cell(3,4,a)).
-init(cell(3,5,a)).
+init(cell(3,5,b)).
 init(cell(3,6,a)).
 init(cell(3,7,a)).
 init(cell(3,8,a)).
@@ -97,7 +97,7 @@ init(cell(7,3,a)).
 init(cell(7,4,a)).
 init(cell(7,5,a)).
 init(cell(7,6,a)).
-init(cell(7,7,a)).
+init(cell(7,7,b)).
 init(cell(7,8,p)).
 init(cell(7,9,a)).
 init(cell(7,10,a)).
@@ -131,7 +131,7 @@ init(cell(9,11,i)).
 
 init(cell(10,0,i)).
 init(cell(10,1,a)).
-init(cell(10,2,a)).
+init(cell(10,2,p)).
 init(cell(10,3,i)).
 init(cell(10,4,i)).
 init(cell(10,5,a)).

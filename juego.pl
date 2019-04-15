@@ -480,7 +480,7 @@ goal(Rol,Goal):-
   distancia((X1,Y1),(X,Y),D),
   %display(D),nl,
   t(score(Rol,Puntaje)),
-  Goal is ((1/D)+Puntaje).
+  Goal is ((1/D)+Puntaje+V).
 
 goal(Rol,Goal):-
   t(cell(_,_,C)),

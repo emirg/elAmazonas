@@ -6,7 +6,7 @@ mejor_accion(R,A) :-
     retractall(utilidad(_,_)),
     retractall(max_utilidad(_,_)),
     findall(A1,legal(R,A1),Ac),
-    write('Acciones legales: '),write(Ac),nl,
+    %write('Acciones legales: '),write(Ac),nl,
     simular_acciones(R,Ac),
     retractall(does(_,_)),
     %conseguir accion de mayor utilidad y devolverla en A.

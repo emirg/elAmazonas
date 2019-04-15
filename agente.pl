@@ -4,9 +4,9 @@ agente2(Rol,MejorAccion):-
   %getAccionesLegales([],AccionesLegales),
   %write('Acciones validas: '),write(AccionesLegales),nl,
   getVecinosValidos((X,Y),[],VecinosValidos),
-  write('Vecinos validos: '),write(VecinosValidos),nl,
-  getMejorAccion(VecinosValidos,_,200,MejorAccion,_),
-  write('Mejor accion: '),write(MejorAccion),nl.
+  %write('Vecinos validos: '),write(VecinosValidos),nl,
+  getMejorAccion(VecinosValidos,_,200,MejorAccion,_).
+  %write('Mejor accion: '),write(MejorAccion),nl.
   
 
 % Obtiene las acciones legales a realizar en el estado
@@ -35,7 +35,7 @@ getVecinosValidos((XP,YP),L0,L1):-
   %write('allowed M '),write(M),nl,
   decrease(M,A,B),
   X1 is X+A,
-  Y1 is Y+B,nl,
+  Y1 is Y+B,
   %write('XValido  '),write(X1),nl,
   %write('YValido  '),write(Y1),nl,
   t(cell(X1,Y1,C)),
@@ -71,7 +71,7 @@ getPersonaCercanaAux((XCabeza,YCabeza),L,R):-
 getPersonaCercanaAux((XCabeza,YCabeza),[],R):-
   t(cell(X,Y,p)),
   distancia((XCabeza,YCabeza),(X,Y),D),
-  getPersonaCercanaAux((XCabeza,YCabeza),[(X,Y,D)],R),nl.
+  getPersonaCercanaAux((XCabeza,YCabeza),[(X,Y,D)],R). %,nl.
   %write('X  '),write(X),nl,write('Y  '),write(Y).
 
 getPersonaCercanaAux((_X,_Y),L,L).
