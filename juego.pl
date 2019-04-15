@@ -115,7 +115,7 @@ isla(i).
 role(c). %Charlie / Jugador 1
 role(s). %Simon / Jugador 2
 
-%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%12
 % Limites del tablero %
 %%%%%%%%%%%%%%%%%%%%%%%
 limites_tablero(12,12). %(cantidad_filas,cantidad_columnas)
@@ -138,6 +138,8 @@ cant_casillas_total(N):- limites_tablero(X,Y), N is X*Y.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- include('mapaConParedes.pl').
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%% Puntacion inicial %%%%%%%%%%%%%%%
@@ -462,19 +464,42 @@ next(serpiente(R,D,_,0)):-
 % Goals %
 %%%%%%%%%
 
+distancia((X1,Y1),(X2,Y2),D) :-
+  D is (abs(X1 - X2) + abs(Y1 -Y2)).
+
+
+goal(Rol,Goal):-
+  role(Rol),
+  t(serpiente(Rol,_,[(X,Y)|_],V)),
+  %display('X'), display(X),nl,
+  %display('Y'), display(Y),nl,
+  V>0,
+  t(cell(X1,Y1,p)),
+  %display('X1'), display(X1),nl,
+  %display('Y1'), display(Y1),nl,
+  distancia((X1,Y1),(X,Y),D),
+  %display(D),nl,
+  t(score(Rol,Puntaje)),
+  Goal is ((1/D)+Puntaje).
+
+goal(Rol,Goal):-
+  t(cell(_,_,C)),
+  distinct(C,p),
+  t(score(Rol,Puntaje)),
+  Goal is Puntaje.  
+/*
 goal(Rol,Goal):-
   role(Rol),
   t(score(Rol,Puntaje)),
   t(serpiente(Rol,_,_,Vidas)),
   Goal is Puntaje + Vidas.
-
-
+*/
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Finaliza %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
            
-% terminal :- estado(25). % Para testing
+terminal :- estado(100). % Para testing
 
 terminal :- t(serpiente(_,_,_,0)). % Si una serpiente muere entonces termina el juego.
 
@@ -544,8 +569,10 @@ juego:-
     nl,
     display('El juego termino'),
     nl,
-    goal(s,Po),
-    goal(c,Px),
+    %goal(s,Po),
+    %goal(c,Px),
+    t(score(s,Po)),
+    t(score(c,Px)),
     display('Charlie obtuvo '),
     display(Px),
     display(' puntos y Simon obtuvo '),
@@ -635,42 +662,58 @@ imprime_fila(N):-
 
     t(cell(N,19,C19)),t(cell(N,20,C20)),*/
 
-    display(C0),display(C1),display(C2),display(C3),
+    imprimir(C0),imprimir(C1),imprimir(C2),imprimir(C3),
 
-    display(C4),display(C5),display(C6),
+    imprimir(C4),imprimir(C5),imprimir(C6),
 
-    display(C7),display(C8),display(C9),
+    imprimir(C7),imprimir(C8),imprimir(C9),
 
-    display(C10),display(C11),/*display(C12),
+    imprimir(C10),imprimir(C11),/*imprimir(C12),
 
-    display(C13),display(C14),display(C15),
+    imprimir(C13),imprimir(C14),imprimir(C15),
 
-    display(C16),display(C17),display(C18),
+    imprimir(C16),imprimir(C17),imprimir(C18),
 
-    display(C19),display(C20),*/nl.
-
- 
-
- 
+    imprimir(C19),imprimir(C20),*/nl.
 
 % Desarrollo jugador j1
 % jugador(c,noop). % Se rompe 
+imprimir(a):-
+  ansi_format([bold,fg(cyan)], ' ', []).
+
+imprimir(s):-
+   ansi_format([bold,fg(yellow)], 's', []).
+
+imprimir(c):-
+   ansi_format([bold,fg(red)], 'c', []).
+
+imprimir(i):-
+   ansi_format([bg(white)], 'i', []).
+
+imprimir(b):-
+   ansi_format([bold,fg(magenta)], 'b', []).
+
+imprimir(p):-
+   ansi_format([bold,bg(cyan)], 'p', []).
+
+imprimir(C):-
+   display(C).
 
 jugador(c,X):-
-    nl,display('Ingresa proximo movimiento de Charlie:'),
+    nl,display('Ingresa proximo movimiento de Charlie:  '),
     agenteGen(X),
     display(X),
     nl.
 % para probar agente vs agente termina en estado 31 con un empate 
-/*
+
 jugador(s,move(X)):-
-    nl,display('Ingresa proximo movimiento de Charlie:'),
+    nl,display('Ingresa proximo movimiento de Simon:  '),display('move('),
     agente2(s,X),
-    display(X),
+    display(X),display(')'),
     nl.
-*/
+
 % Desarrollo jugador j2
-jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
+%jugador(s,X):- display('Ingrese próximo movimiento:'), read(X).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -690,7 +733,7 @@ agente1(Rol,A):-
 % Busca la persona mas cercana, y una vez localizada se mueve al vecino
 % mas cercano a esa persona y asi sucesivamente. 
 % Esquiva barriles, islas/paredes y otras serpientes
-%:- include('agente.pl').
+:- include('agente.pl').
 
 % Agente 3 (Generico)
 :- include('agenteGenerico.pl').
